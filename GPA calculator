@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sri Lankan University GPA Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      width: 600px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .subject {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    label {
+      font-weight: 600;
+      color: #444;
+    }
+    input {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+    input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 12px;
+    }
+    .subject-result {
+      background: #eef6ff;
+      padding: 10px;
+      margin: 8px 0;
+      border-left: 5px solid #007bff;
+      border-radius: 6px;
+    }
+    .overall {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+      padding: 10px;
+      background: #d1f7d6;
+      border-radius: 8px;
+      border: 2px solid #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>GPA Calculator</h2>
+
+    <!-- Step 1: Ask for number of subjects -->
+    <div id="setup">
+      <label for="numSubjects">Enter Number of Subjects:</label>
+      <input type="number" id="numSubjects" min="1" placeholder="e.g. 5">
+      <button onclick="generateSubjects()">Submit</button>
+    </div>
+
+    <!-- Step 2: Subjects inputs -->
+    <form id="subjectsForm" style="display:none;">
+      <div id="subjects"></div>
+      <button type="button" onclick="calculateGPA()">Calculate GPA</button>
+    </form>
+
+    <!-- Step 3: Results -->
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    function generateSubjects() {
+      const num = parseInt(document.getElementById("numSubjects").value);
+      const subjectsDiv = document.getElementById("subjects");
+
+      if (isNaN(num) || num <= 0) {
+        alert("⚠️ Please enter a valid number of subjects.");
+        return;
+      }
+
+      subjectsDiv.innerHTML = ""; // clear old inputs
+      for (let i = 1; i <= num; i++) {
+        subjectsDiv.innerHTML += `
+          <div class="subject">
+            <label for="sub${i}">Subject ${i} Marks:</label>
+            <input type="number" id="sub${i}" placeholder="Enter marks (0-100)" min="0" max="100">
+          </div>
+        `;
+      }
+
+      document.getElementById("subjectsForm").style.display = "block";
+    }
+
+    function getGradeDetails(marks) {
+      if (marks >= 85) return ["A+", 4.0, "Superior Performance"];
+      else if (marks >= 70) return ["A", 4.0, "Excellent"];
+      else if (marks >= 65) return ["A-", 3.7, "Very Good"];
+      else if (marks >= 60) return ["B+", 3.3, "Good, clearly above average"];
+      else if (marks >= 55) return ["B", 3.0, "Above average"];
+      else if (marks >= 50) return ["B-", 2.7, "Average performance"];
+      else if (marks >= 45) return ["C+", 2.3, "Quite Satisfactory"];
+      else if (marks >= 40) return ["C", 2.0, "Pass and possesses basic understanding"];
+      else if (marks >= 35) return ["C-", 1.7, "Satisfactory"];
+      else if (marks >= 30) return ["D+", 1.3, "Weak"];
+      else if (marks >= 25) return ["D", 1.0, "Quite Weak"];
+      else return ["E", 0.0, "Very Weak"];
+    }
+
+    function calculateGPA() {
+      const num = parseInt(document.getElementById("numSubjects").value);
+      let totalGPA = 0, count = 0;
+      let resultsHTML = "";
+
+      for (let i = 1; i <= num; i++) {
+        let marks = parseInt(document.getElementById("sub" + i).value);
+
+        if (isNaN(marks) || marks < 0 || marks > 100) {
+          resultsHTML += `<div class="subject-result">⚠️ Subject ${i}: Invalid input</div>`;
+          continue;
+        }
+
+        let [grade, gpa, description] = getGradeDetails(marks);
+        totalGPA += gpa;
+        count++;
+
+        resultsHTML += `
+          <div class="subject-result">
+            Subject ${i}: Marks = ${marks} | Grade = ${grade} | GPA = ${gpa} | ${description}
+          </div>
+        `;
+      }
+
+      if (count > 0) {
+        let overall = (totalGPA / count).toFixed(2);
+        resultsHTML += `<div class="overall">⭐ Overall GPA: ${overall}</div>`;
+      }
+
+      document.getElementById("results").innerHTML = resultsHTML;
+    }
+  </script>
+</body>
+</html>
